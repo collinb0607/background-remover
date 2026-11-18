@@ -37,7 +37,7 @@ jobs:
         # One file, no console window. tkinterdnd2 ships its own PyInstaller hook (its native drag-and-drop
         # library), and PyInstaller has one for onnxruntime. The AI models are downloaded by the app, not bundled.
         run: |
-          pyinstaller --noconfirm --onefile --windowed --name Background-Remover background_remover.py
+          pyinstaller --noconfirm --icon assets/icon.ico --onefile --windowed --name Background-Remover background_remover.py
           Move-Item dist/Background-Remover.exe ${{ matrix.asset }}
 
       - name: Build (macOS)
@@ -45,7 +45,7 @@ jobs:
         # A .app bundle (one-dir: macOS apps are folders). ditto keeps the
         # permissions and code signature that a plain zip would lose.
         run: |
-          pyinstaller --noconfirm --windowed --name "Background Remover" background_remover.py
+          pyinstaller --noconfirm --icon assets/icon.icns --windowed --name "Background Remover" background_remover.py
           ditto -c -k --keepParent "dist/Background Remover.app" ${{ matrix.asset }}
 
       # Smoke test: the app must start and still be running after 20 s
