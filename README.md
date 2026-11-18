@@ -87,6 +87,8 @@ The AI models are [IS-Net](https://github.com/xuebinqin/DIS) (Apache 2.0) and
 [BiRefNet](https://github.com/ZhengPeng7/BiRefNet) (MIT), as converted and published by
 [rembg](https://github.com/danielgatis/rembg) (MIT), whose way of running them this app follows.
 
+The icons are from [Lucide](https://lucide.dev) (ISC license, see [assets/LUCIDE-LICENSE.txt](assets/LUCIDE-LICENSE.txt)).
+
 ## Support this project
 This app is free, with no ads, accounts or limits. If it saved you time or a subscription, you can
 support its development on Ko-fi:
