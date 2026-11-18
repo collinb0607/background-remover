@@ -2,7 +2,7 @@
 """
 Background Remover - a cross-platform (Windows / macOS / Linux) tool that cuts
 the subject out of photos, in batches, using AI models that run on your own
-computer. Saves transparent PNGs, or puts the subject on a solid colour.
+computer. Saves transparent PNGs, or puts the subject on a solid color.
 
 The models are the ones the rembg project publishes (IS-Net and BiRefNet),
 run directly with onnxruntime, the same way rembg runs them. Each model is
@@ -45,7 +45,7 @@ FILE_TYPES = [
 
 # The models, as published by rembg (https://github.com/danielgatis/rembg).
 # Each takes a 1024×1024 picture and returns how likely each pixel is to be
-# part of the subject. 'mean'/'std' are the input normalisation it was trained with.
+# part of the subject. 'mean'/'std' are the input normalization it was trained with.
 MODEL_URL = "https://github.com/danielgatis/rembg/releases/download/v0.0.0/"
 IMAGENET = ((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
 MODELS = {
@@ -66,7 +66,7 @@ MODELS = {
         about="About 1 s per photo and under 1 GB of memory. Fine for simple photos (products, "
               "plain backgrounds); struggles with hair and cluttered scenes."),
 }
-FORMATS = ["JPG", "PNG"]  # for a colour background; transparent is always PNG
+FORMATS = ["JPG", "PNG"]  # for a color background; transparent is always PNG
 JPG_QUALITY = 92
 MARGINS = ["0", "10", "20", "50", "100"]
 SUBJECT_ALPHA = 8  # pixels more see-through than this don't count as subject when cropping
@@ -186,7 +186,7 @@ def model_path(cfg):
 
 def download_model(cfg, on_progress, check_cancel):
     """Download a model file, checking it against its published MD5.
-    Written under a temporary name, so a cancelled or broken download is never used."""
+    Written under a temporary name, so a canceled or broken download is never used."""
     import ssl
     import urllib.request
     try:
@@ -233,7 +233,7 @@ def load_session(cfg):
 def predict_mask(session, cfg, img):
     """The model's subject mask for `img`, as an 'L' image the size of `img`.
 
-    Same steps as rembg: resize to 1024×1024, scale to 0–1, normalise, run,
+    Same steps as rembg: resize to 1024×1024, scale to 0–1, normalize, run,
     (sigmoid for BiRefNet), stretch to the full 0–255 range, resize back.
     """
     im = img.convert("RGB").resize((1024, 1024), Image.Resampling.LANCZOS)
@@ -251,7 +251,7 @@ def predict_mask(session, cfg, img):
 
 
 # --------------------------------------------------------------------------- #
-#  Clean edges: foreground colour estimation
+#  Clean edges: foreground color estimation
 # --------------------------------------------------------------------------- #
 def _box1d(a, r, axis):
     """Mean over a window of 2r+1 along one axis (shrinking at the edges), via a running sum."""
@@ -276,15 +276,15 @@ def _blur(a, r):
 
 
 def clean_edges(img, mask):
-    """Estimate the subject's own colours where it's partly see-through (hair,
-    fur, soft edges), so the old background doesn't show as a coloured fringe
+    """Estimate the subject's own colors where it's partly see-through (hair,
+    fur, soft edges), so the old background doesn't show as a colored fringe
     when it's put on a new one.
 
-    "Approximate Fast Foreground Colour Estimation" (Forte & Pitié, 2021): a
-    blurred-average estimate of foreground and background colours, refined
+    "Approximate Fast Foreground Color Estimation" (Forte & Pitié, 2021): a
+    blurred-average estimate of foreground and background colors, refined
     twice. The wide first pass is done at quarter size (it's a heavy blur, so
     nothing is lost). The fine second pass only changes pixels that are partly
-    see-through (fully opaque ones keep their colour, fully transparent ones
+    see-through (fully opaque ones keep their color, fully transparent ones
     aren't seen), so it runs only on the tiles that contain some, padded so
     the result is the same as doing the whole picture. One channel at a time,
     to keep memory down.
@@ -327,7 +327,7 @@ def clean_edges(img, mask):
 #  Per-photo work (worker thread; no Tk calls in here)
 # --------------------------------------------------------------------------- #
 def open_photo(path):
-    """Open a photo the right way up. Returns (image, colour profile or None)."""
+    """Open a photo the right way up. Returns (image, color profile or None)."""
     with Image.open(path) as im:
         if getattr(im, "n_frames", 1) > 1:
             im.seek(0)
@@ -355,7 +355,7 @@ def subject_mask(session, cfg, img):
 
 def render(img, mask, s):
     """The finished picture: the cut-out subject, cropped if asked, on
-    transparency or on a colour. Returns (image, cropped_box or None)."""
+    transparency or on a color. Returns (image, cropped_box or None)."""
     fg = clean_edges(img, mask)
     box = None
     if s["crop"]:
@@ -365,8 +365,8 @@ def render(img, mask, s):
             box = (max(0, box[0] - m), max(0, box[1] - m), min(img.width, box[2] + m), min(img.height, box[3] + m))
             fg, mask = fg.crop(box), mask.crop(box)
     if s["colour"] is None:
-        # Fully clear pixels are black: their colour is never seen, and the
-        # leftover background colours would make the PNG several times bigger.
+        # Fully clear pixels are black: their color is never seen, and the
+        # leftover background colors would make the PNG several times bigger.
         fg.paste((0, 0, 0), mask=mask.point(lambda v: 255 if v == 0 else 0))
         fg.putalpha(mask)
         return fg, box
@@ -633,7 +633,7 @@ class RemoverApp:
         f.grid(row=2, column=0, sticky="ew", **pad)
         ttk.Radiobutton(f, text="Transparent background (PNG)", value="transparent",
                         variable=self.v["background"]).grid(row=0, column=0, columnspan=4, sticky="w", **pad)
-        ttk.Radiobutton(f, text="Colour background:", value="colour",
+        ttk.Radiobutton(f, text="Color background:", value="colour",
                         variable=self.v["background"]).grid(row=1, column=0, sticky="w", **pad)
         self.swatch = tk.Label(f, width=3, relief="solid", borderwidth=1, bg=self.v["colour"].get())
         self.swatch.grid(row=1, column=1, sticky="w", **pad)
@@ -705,7 +705,7 @@ class RemoverApp:
         self.dir_btn.config(state=state)
 
     def pick_colour(self):
-        rgb, hexcode = colorchooser.askcolor(color=self.v["colour"].get(), title="Background colour")
+        rgb, hexcode = colorchooser.askcolor(color=self.v["colour"].get(), title="Background color")
         if hexcode:
             self.v["colour"].set(hexcode)
             self.swatch.config(bg=hexcode)
@@ -1009,7 +1009,7 @@ class RemoverApp:
         return self.masks[key]
 
     def _process(self, path, s):
-        """Cut out one photo. Returns (original, result, colour profile, seconds, crop box or None)."""
+        """Cut out one photo. Returns (original, result, color profile, seconds, crop box or None)."""
         t0 = time.monotonic()
         img, icc = open_photo(path)
         mask = self._mask(s["model"], path, img)
@@ -1026,7 +1026,7 @@ class RemoverApp:
                              self.status.config(text=f"Preview ready ({secs:.1f} s). "
                                                      "Click Remove backgrounds to save.")))
         except Cancelled:
-            self.ui(lambda: (self._set_row(iid, status="Ready"), self.status.config(text="Preview cancelled.")))
+            self.ui(lambda: (self._set_row(iid, status="Ready"), self.status.config(text="Preview canceled.")))
         except Exception as e:
             log_error(f"{path}\n{type(e).__name__}: {e}")
             self.ui(lambda e=e: (self._set_row(iid, status=f"Failed: {explain_error(e)}"),
@@ -1040,7 +1040,7 @@ class RemoverApp:
         try:
             self._session(s["model"])
         except Cancelled:
-            self.ui(lambda: self._finish_early("Cancelled."))
+            self.ui(lambda: self._finish_early("Canceled."))
             return
         except Exception as e:
             log_error(f"Model: {type(e).__name__}: {e}")
@@ -1052,7 +1052,7 @@ class RemoverApp:
             return
         for k, (iid, src, out) in enumerate(jobs):
             if self.cancelled:
-                self.ui(lambda i=iid: self._set_row(i, status="Cancelled"))
+                self.ui(lambda i=iid: self._set_row(i, status="Canceled"))
                 results["cancelled"] += 1
                 continue
             self.ui(lambda i=iid, k=k: (self._set_row(i, status="Working…"),
@@ -1074,7 +1074,7 @@ class RemoverApp:
                 results["done"] += 1
                 first_out = first_out or out
             except Cancelled:
-                status = "Cancelled"
+                status = "Canceled"
                 results["cancelled"] += 1
             except Exception as e:  # keep going with the other photos
                 log_error(f"{src}\n{type(e).__name__}: {e}")
@@ -1102,7 +1102,7 @@ class RemoverApp:
         if r["failed"]:
             parts.append(f"{r['failed']} failed — see the list")
         if r["cancelled"]:
-            parts.append(f"{r['cancelled']} cancelled")
+            parts.append(f"{r['cancelled']} canceled")
         self.status.config(text=("Done! " if not (r["failed"] or r["cancelled"]) else "") +
                            ", ".join(parts) + ".")
         if first_out and self.v["reveal"].get() and not self.cancelled:
@@ -1143,7 +1143,7 @@ class PreviewWindow:
                   wraplength=2 * self.SIDE).grid(row=2, column=0, columnspan=2, pady=(8, 0))
         ttk.Button(frame, text="Close", command=self.win.destroy).grid(row=3, column=0, columnspan=2, pady=(8, 0))
         self.win.bind("<Escape>", lambda e: self.win.destroy())
-        # Centre it over the main window (a new window can otherwise open on
+        # Center it over the main window (a new window can otherwise open on
         # another monitor, or off screen).
         self.win.withdraw()
         self.win.update_idletasks()
@@ -1243,7 +1243,7 @@ def support_link(parent, bg=None, font=None):
 
 # --------------------------------------------------------------------------- #
 #  The look (shared by the Offline Toolkit apps): white cards, a dark purple
-#  header fading to blue, blue actions. Only colours and fonts: no behaviour.
+#  header fading to blue, blue actions. Only colors and fonts: no behavior.
 # --------------------------------------------------------------------------- #
 THEME = dict(
     bg="#ffffff", card="#ffffff", border="#e2ddf0", text="#1c1433", muted="#6e6787", error="#c8364f",
@@ -1284,7 +1284,7 @@ def _indicator_image(root, kind, on, enabled, n=18, k=4):
         return (x - cx) ** 2 + (y - cy) ** 2 <= r * r
 
     def colour_at(x, y):
-        """The colour of one sample point, or None where it's see-through."""
+        """The color of one sample point, or None where it's see-through."""
         c = n / 2
         d = ((x - c) ** 2 + (y - c) ** 2) ** 0.5
         if kind == "check":
@@ -1328,7 +1328,7 @@ def _indicator_image(root, kind, on, enabled, n=18, k=4):
 
 
 def apply_theme(root):
-    """ttk's "clam" theme, recoloured (the native Windows and macOS themes ignore colours)."""
+    """ttk's "clam" theme, recoloured (the native Windows and macOS themes ignore colors)."""
     import tkinter.font as tkfont
     t, fam = THEME, ui_family()
     root.configure(bg=t["bg"])
@@ -1343,7 +1343,7 @@ def apply_theme(root):
     s.configure(".", background=t["bg"], foreground=t["text"], font=(fam, 10), bordercolor=t["border"],
                 focuscolor=t["blue"], lightcolor=t["card"], darkcolor=t["border"], troughcolor="#ece8f7")
     s.map(".", foreground=[("disabled", t["disabled"])])
-    s.map("TLabel", background=[("disabled", t["card"])])  # clam greys a disabled label's background
+    s.map("TLabel", background=[("disabled", t["card"])])  # clam grays a disabled label's background
     s.configure("TLabelframe", background=t["card"], bordercolor=t["border"], lightcolor=t["border"],
                 darkcolor=t["border"], relief="solid", borderwidth=1)
     s.configure("TLabelframe.Label", background=t["card"], foreground=t["purple2"], font=(fam, 11, "bold"))

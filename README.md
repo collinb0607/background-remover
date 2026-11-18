@@ -5,7 +5,7 @@
 ![Background Remover: drag in photos, preview a cutout, remove all the backgrounds](docs/demo.gif)
 
 Cuts the subject out of photos (people, pets, products) and saves a **transparent PNG**, or puts
-it on a **colour of your choice**. Batches of any size, with drag and drop. The AI runs on your
+it on a **color of your choice**. Batches of any size, with drag and drop. The AI runs on your
 own computer, so your photos never leave it. Works on Windows and macOS.
 
 ## Download
@@ -42,17 +42,17 @@ before saving the batch. If the edges look wrong, try another model.
 - **Before/after preview.** Shows the original and the result side by side, with transparency as
   a checkerboard. A previewed photo isn't processed twice when you save the batch.
 - **Clean edges.** Where the subject is partly see-through (hair, fur, soft edges), the app
-  estimates the subject's own colours, so the old background doesn't show as a coloured fringe
+  estimates the subject's own colors, so the old background doesn't show as a colored fringe
   on the new one. Inside the subject, nothing is see-through.
-- **Colour background.** White or any colour from a colour picker, saved as JPG or PNG. Handy for
+- **Color background.** White or any color from a color picker, saved as JPG or PNG. Handy for
   product listings and profile pictures.
 - **Crop to the subject.** Trims the empty space around it, with a margin you choose.
 - **Safe with your files.** Results are new files next to the original (or in a folder you pick):
-  `dog.jpg` becomes `dog (no background).png`, or `dog (new background).jpg` with a colour. If they
+  `dog.jpg` becomes `dog (no background).png`, or `dog (new background).jpg` with a color. If they
   already exist it asks once for the whole batch: replace, skip those, or stop. Each file is
   written under a temporary name and renamed when finished, so Cancel never leaves half a file.
 - **Private.** Results contain no camera or location data. Photos are turned upright first, and
-  their colour profile is kept.
+  their color profile is kept.
 
 ## Run from source (Python)
 ### Setup (one time)
@@ -76,7 +76,7 @@ install the components once more. The install dialog shows which Python it insta
 - **Part of the background is kept, or part of the subject is cut away:** try another model in
   **Preview**. BiRefNet handles cluttered scenes much better than IS-Net.
 - **The model download fails:** check your internet connection and try again. A failed or
-  cancelled download is never used. You can also place the model file yourself in
+  canceled download is never used. You can also place the model file yourself in
   `~/.rembg/models/<model name>/` (for example `isnet-general-use/isnet-general-use.onnx`).
 - **Something fails with no message:** errors are also written to `background_remover_errors.log`
   in your temp folder. On Windows, paste `%TEMP%\background_remover_errors.log` into File Explorer's
